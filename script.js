@@ -122,9 +122,264 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Initialize share button
+  initializeShareButton();
+
+  // Initialize PWA features
+  initializePWA();
+
   setupEventListeners();
   loadDataFromURL(); // Load data automatically instead of file input
 });
+
+// Share functionality
+function initializeShareButton() {
+  const shareButton = document.getElementById('shareButton');
+  if (!shareButton) return;
+
+  shareButton.addEventListener('click', async function() {
+    const shareData = {
+      title: 'Infographic – Projets AFD | Dashboard des Financements de l\'Agence Française de Développement',
+      text: 'Découvrez l\'analyse interactive des projets de l\'AFD : financements, localisations, secteurs et chronologie des projets de développement français dans le monde.',
+      url: window.location.href
+    };
+
+    try {
+      // Try using the Web Share API first (for mobile devices)
+      if (navigator.share) {
+        await navigator.share(shareData);
+        console.log('Content shared successfully');
+      } else {
+        // Fallback: show share modal with different options
+        showShareModal(shareData);
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Fallback: copy to clipboard
+      fallbackShare(shareData);
+    }
+  });
+}
+
+// Show share modal for desktop browsers
+function showShareModal(shareData) {
+  // Create modal
+  const modal = document.createElement('div');
+  modal.className = 'share-modal';
+  modal.innerHTML = `
+    <div class="share-modal-content">
+      <div class="share-modal-header">
+        <h3><i class="fas fa-share-alt"></i> Partager cette page</h3>
+        <button class="share-modal-close">&times;</button>
+      </div>
+      <div class="share-modal-body">
+        <div class="share-options">
+          <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareData.text)}&url=${encodeURIComponent(shareData.url)}&via=AIFR_AI" target="_blank" class="share-option twitter">
+            <i class="fab fa-twitter"></i> Twitter
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareData.url)}" target="_blank" class="share-option facebook">
+            <i class="fab fa-facebook-f"></i> Facebook
+          </a>
+          <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareData.url)}" target="_blank" class="share-option linkedin">
+            <i class="fab fa-linkedin-in"></i> LinkedIn
+          </a>
+          <a href="mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodeURIComponent(shareData.text + ' ' + shareData.url)}" class="share-option email">
+            <i class="fas fa-envelope"></i> Email
+          </a>
+          <button class="share-option copy-url" data-url="${shareData.url}">
+            <i class="fas fa-copy"></i> Copier le lien
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Close modal functionality
+  const closeBtn = modal.querySelector('.share-modal-close');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(modal);
+  });
+
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      document.body.removeChild(modal);
+    }
+  });
+
+  // Copy URL functionality
+  const copyBtn = modal.querySelector('.copy-url');
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      copyBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+      copyBtn.style.background = 'var(--completed-color)';
+      setTimeout(() => {
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copier le lien';
+        copyBtn.style.background = '';
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      fallbackCopyToClipboard(shareData.url);
+    }
+  });
+
+  // Animate modal appearance
+  if (typeof gsap !== 'undefined') {
+    gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+    gsap.fromTo(modal.querySelector('.share-modal-content'), 
+      { scale: 0.8, y: 50 }, 
+      { scale: 1, y: 0, duration: 0.3, delay: 0.1 }
+    );
+  }
+}
+
+// Fallback share method
+function fallbackShare(shareData) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareData.url).then(() => {
+      showNotification('Lien copié dans le presse-papiers !', 'success');
+    }).catch(() => {
+      fallbackCopyToClipboard(shareData.url);
+    });
+  } else {
+    fallbackCopyToClipboard(shareData.url);
+  }
+}
+
+// Fallback copy to clipboard for older browsers
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.top = '0';
+  textArea.style.left = '0';
+  textArea.style.position = 'fixed';
+  textArea.style.opacity = '0';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    showNotification('Lien copié dans le presse-papiers !', 'success');
+  } catch (err) {
+    console.error('Fallback: Oops, unable to copy', err);
+    showNotification('Impossible de copier le lien automatiquement. Veuillez copier l\'URL manuellement.', 'error');
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Animate in
+  if (typeof gsap !== 'undefined') {
+    gsap.fromTo(notification, 
+      { opacity: 0, y: -50, scale: 0.8 }, 
+      { opacity: 1, y: 0, scale: 1, duration: 0.3 }
+    );
+  }
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    if (typeof gsap !== 'undefined') {
+      gsap.to(notification, { 
+        opacity: 0, 
+        y: -30, 
+        duration: 0.3, 
+        onComplete: () => {
+          if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+          }
+        }
+      });
+    } else {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }
+  }, 3000);
+}
+
+// PWA functionality
+function initializePWA() {
+  // Register service worker if available
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then((registration) => {
+        console.log('SW registered: ', registration);
+      }).catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+    });
+  }
+
+  // Handle install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Show install button or notification
+    showInstallPrompt();
+  });
+
+  // Handle app installed
+  window.addEventListener('appinstalled', (evt) => {
+    console.log('App was installed.');
+    showNotification('Application installée avec succès !', 'success');
+  });
+}
+
+// Show install prompt
+function showInstallPrompt() {
+  const installBanner = document.createElement('div');
+  installBanner.className = 'install-banner';
+  installBanner.innerHTML = `
+    <div class="install-banner-content">
+      <i class="fas fa-download"></i>
+      <span>Installer l'application AFD Dashboard pour un accès hors ligne</span>
+      <button id="installBtn">Installer</button>
+      <button id="dismissBtn">&times;</button>
+    </div>
+  `;
+  
+  document.body.appendChild(installBanner);
+  
+  // Install button click
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      deferredPrompt = null;
+    }
+    document.body.removeChild(installBanner);
+  });
+  
+  // Dismiss button click
+  document.getElementById('dismissBtn').addEventListener('click', () => {
+    document.body.removeChild(installBanner);
+  });
+  
+  // Auto-dismiss after 10 seconds
+  setTimeout(() => {
+    if (document.body.contains(installBanner)) {
+      document.body.removeChild(installBanner);
+    }
+  }, 10000);
+}
 
 // Load data from the specified URL
 function loadDataFromURL() {

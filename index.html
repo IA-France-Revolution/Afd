@@ -3,8 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="Visualisation des projets de l'Agence Française de Développement (AFD)">
-  <title>Infographic – Projets AFD</title>
+  
+  <!-- Primary Meta Tags -->
+  <title>Infographic – Projets AFD | Analyse des Financements de l'Agence Française de Développement</title>
+  <meta name="title" content="Infographic – Projets AFD | Analyse des Financements de l'Agence Française de Développement">
+  <meta name="description" content="Dashboard interactif analysant les projets de l'Agence Française de Développement (AFD). Visualisez les financements, localisations, secteurs et chronologie des projets de développement français dans le monde.">
+  <meta name="keywords" content="AFD, Agence Française de Développement, projets développement, financement international, coopération française, aide au développement, data visualization, dashboard, France">
+  <meta name="author" content="AI France Revolution">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="French">
+  <meta name="revisit-after" content="7 days">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://ia-france-revolution.github.io/Afd/">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ia-france-revolution.github.io/Afd/">
+  <meta property="og:title" content="Infographic – Projets AFD | Analyse des Financements de l'Agence Française de Développement">
+  <meta property="og:description" content="Dashboard interactif analysant les projets de l'Agence Française de Développement (AFD). Visualisez les financements, localisations, secteurs et chronologie des projets de développement français dans le monde.">
+  <meta property="og:image" content="https://github.com/IA-France-Revolution/Afd/blob/main/afdOG.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="AFD Projects Dashboard">
+  <meta property="og:locale" content="fr_FR">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://ia-france-revolution.github.io/Afd/">
+  <meta property="twitter:title" content="Infographic – Projets AFD | Analyse des Financements de l'Agence Française de Développement">
+  <meta property="twitter:description" content="Dashboard interactif analysant les projets de l'Agence Française de Développement (AFD). Visualisez les financements, localisations, secteurs et chronologie des projets de développement français dans le monde.">
+  <meta property="twitter:image" content="https://github.com/IA-France-Revolution/Afd/blob/main/afdOG.webp">
+  <meta property="twitter:creator" content="@AIFR_AI">
+  
+  <!-- Favicon and PWA -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#0055A4">
+  <meta name="msapplication-TileColor" content="#0055A4">
+  <meta name="msapplication-navbutton-color" content="#0055A4">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   
   <!-- External Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -28,6 +73,43 @@
   
   <!-- Custom styles -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "AFD Projects Dashboard",
+    "description": "Dashboard interactif analysant les projets de l'Agence Française de Développement (AFD). Visualisez les financements, localisations, secteurs et chronologie des projets de développement français dans le monde.",
+    "url": "https://ia-france-revolution.github.io/Afd/",
+    "applicationCategory": "DataVisualization",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "creator": {
+      "@type": "Organization",
+      "name": "AI France Revolution",
+      "url": "https://aifr.ai",
+      "logo": "https://aifr.ai/aifr-og.webp",
+      "sameAs": [
+        "https://twitter.com/AIFR_AI",
+        "https://github.com/IA-France-Revolution",
+        "https://www.linkedin.com/company/aifrancerevolution/",
+        "https://www.youtube.com/@AIFranceRevolution",
+        "https://t.me/IAFranceRevolution_bot"
+      ]
+    },
+    "about": {
+      "@type": "Organization",
+      "name": "Agence Française de Développement",
+      "alternateName": "AFD",
+      "description": "L'Agence française de développement (AFD) est un établissement public français qui finance et accompagne des projets qui améliorent les conditions de vie des populations dans les pays en développement et émergents et dans l'Outre-mer français."
+    },
+    "dateModified": "2024-12-19",
+    "inLanguage": "fr-FR",
+    "isAccessibleForFree": true,
+    "keywords": "AFD, Agence Française de Développement, projets développement, financement international, coopération française, aide au développement, data visualization, dashboard"
+  }
+  </script>
 </head>
 <body>
   <!-- Navigation Bar -->
@@ -54,6 +136,11 @@
       </div>
     </div>
   </div>
+
+  <!-- Share Button -->
+  <button class="share-button" id="shareButton" title="Partager cette page" aria-label="Partager cette page">
+    <i class="fas fa-share-alt"></i>
+  </button>
   
   <!-- Hero Section -->
   <section class="hero" id="home">
@@ -264,6 +351,62 @@
       </div>
     </section>
   </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="footer-logo">
+          <i class="fas fa-chart-pie"></i>
+          <h3>AFD Dashboard</h3>
+        </div>
+        <p>Dashboard interactif analysant les projets de l'Agence Française de Développement. Une initiative pour rendre transparentes les données de financement du développement international français.</p>
+        <p><strong>Source des données :</strong> <a href="https://www.data.gouv.fr" target="_blank" rel="noopener noreferrer" style="color: rgba(255,255,255,0.9);">data.gouv.fr</a></p>
+      </div>
+      
+      <div class="footer-section">
+        <h3>À propos</h3>
+        <ul>
+          <li><a href="https://www.afd.fr" target="_blank" rel="noopener noreferrer"><i class="fas fa-globe"></i> Site officiel AFD</a></li>
+          <li><a href="https://www.data.gouv.fr/fr/datasets/projets-de-lafd/" target="_blank" rel="noopener noreferrer"><i class="fas fa-database"></i> Données source</a></li>
+          <li><a href="#stats"><i class="fas fa-chart-bar"></i> Voir les statistiques</a></li>
+          <li><a href="#table"><i class="fas fa-table"></i> Explorer les données</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Créé par</h3>
+        <div class="footer-logo">
+          <i class="fas fa-robot"></i>
+          <h4><a href="https://aifr.ai" target="_blank" rel="noopener noreferrer" style="color: var(--accent1); text-decoration: none;">AI France Revolution</a></h4>
+        </div>
+        <p>Révolutionnons l'IA en France - Intelligence artificielle au service de l'innovation et de la transparence.</p>
+        
+        <div class="social-links">
+          <a href="https://twitter.com/AIFR_AI" target="_blank" rel="noopener noreferrer" title="Twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="https://github.com/IA-France-Revolution" target="_blank" rel="noopener noreferrer" title="GitHub">
+            <i class="fab fa-github"></i>
+          </a>
+          <a href="https://www.linkedin.com/company/aifrancerevolution/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+          <a href="https://www.youtube.com/@AIFranceRevolution" target="_blank" rel="noopener noreferrer" title="YouTube">
+            <i class="fab fa-youtube"></i>
+          </a>
+          <a href="https://t.me/IAFranceRevolution_bot" target="_blank" rel="noopener noreferrer" title="Telegram">
+            <i class="fab fa-telegram-plane"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2024 AI France Revolution. Dashboard AFD - Projets de développement.</p>
+      <p>Données publiques issues de <a href="https://www.data.gouv.fr" target="_blank" rel="noopener noreferrer" style="color: rgba(255,255,255,0.9);">data.gouv.fr</a> - <a href="https://aifr.ai" target="_blank" rel="noopener noreferrer" style="color: rgba(255,255,255,0.9);">Réalisé par AIFR.AI</a></p>
+    </div>
+  </footer>
   
   <!-- Custom script -->
   <script src="script.js"></script>
