@@ -486,6 +486,33 @@ function formatNumber(num, fractionDigits = 2) {
   });
 }
 
+// Intelligent budget formatting for better readability
+function formatBudgetIntelligent(amount) {
+  if (typeof amount !== 'number' || isNaN(amount)) return 'N/A';
+  
+  // Amount is already in millions
+  const millions = amount;
+  
+  if (millions >= 1000) {
+    // Billions
+    const billions = millions / 1000;
+    return billions.toFixed(billions >= 10 ? 1 : 2).replace('.0', '') + ' Md€';
+  } else if (millions >= 1) {
+    // Millions
+    return millions.toFixed(millions >= 10 ? 1 : 2).replace('.0', '') + ' M€';
+  } else if (millions >= 0.001) {
+    // Thousands (convert millions to thousands)
+    const thousands = millions * 1000;
+    return thousands.toFixed(0) + ' k€';
+  } else if (millions > 0) {
+    // Less than 1000€
+    const euros = millions * 1000000;
+    return euros.toFixed(0) + ' €';
+  } else {
+    return '0 €';
+  }
+}
+
 function getStatusTag(status) {
   if (!status) return '<span class="tag">Non spécifié</span>';
   let className = '';
@@ -741,11 +768,11 @@ function displaySortMetrics(field, direction, originalFirstItem) {
 
     const [minBudVal, maxBudVal] = [valFirst, valLast].sort((a,b) => a - b);
     
-    content = `<span class="sort-info">De ${formatNumber(minBudVal)} M€ à ${formatNumber(maxBudVal)} M€</span>`;
-    content += `<span class="sort-range">Étendue: ${formatNumber(maxBudVal - minBudVal)} M€</span>`;
+    content = `<span class="sort-info">De ${formatBudgetIntelligent(minBudVal)} à ${formatBudgetIntelligent(maxBudVal)}</span>`;
+    content += `<span class="sort-range">Étendue: ${formatBudgetIntelligent(maxBudVal - minBudVal)}</span>`;
     
     const avgBudget = filteredData.reduce((sum, item) => sum + (item.budgetMillions || 0), 0) / filteredData.length;
-    content += `<span class="sort-avg">Moyenne: ${formatNumber(avgBudget)} M€</span>`;
+    content += `<span class="sort-avg">Moyenne: ${formatBudgetIntelligent(avgBudget)}</span>`;
     
   } else if (field === 'title') {
     icon = direction === 'asc' ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up-alt';
@@ -895,13 +922,13 @@ function populateTableRows(tbody, pageData) {
           <i class="fas fa-plus-circle"></i>
         </button>
       </td>
-      <td class="expandable-cell" title="${row.title || ''}">
+      <td class="project-title-cell" title="${row.title || ''}">
         ${row.lien ? `<a href="${row.lien}" target="_blank" rel="noopener noreferrer">${row.title}</a>` : row.title}
       </td>
-      <td class="number-cell">${row.budgetMillions != null ? formatNumber(row.budgetMillions) + ' M€' : '-'}</td>
+      <td class="number-cell">${row.budgetMillions != null ? formatBudgetIntelligent(row.budgetMillions) : '-'}</td>
       <td>${getStatusTag(row.state)}</td>
       <td>${row.country}</td>
-      <td class="expandable-cell" title="${row.sector || ''}">${row.sector}</td>
+      <td class="sector-cell" title="${row.sector || ''}">${row.sector}</td>
       <td>${formattedDate}</td>
     `;
     tbody.appendChild(tr);
@@ -1082,11 +1109,11 @@ function updateFilterMetrics() {
         <div class="metric-label">${filterPercentage}% des projets totaux</div>
     </div>
     <div class="metric-item">
-        <div class="metric-number">${formatNumber(filteredBudgetSum)} M€</div>
+        <div class="metric-number">${formatBudgetIntelligent(filteredBudgetSum)}</div>
         <div class="metric-label">${budgetPercentage}% du budget total</div>
     </div>
     <div class="metric-item">
-        <div class="metric-number">${formatNumber(avgBudgetFiltered)} M€</div>
+        <div class="metric-number">${formatBudgetIntelligent(avgBudgetFiltered)}</div>
         <div class="metric-label">Budget moyen (sélection)</div>
     </div>
   `;
@@ -1125,7 +1152,7 @@ function updateTableFooterMetrics() {
   
   footerMetrics.innerHTML = `
     <div class="metric-item">
-        <div class="metric-number">${formatNumber(budgetSum)} M€</div>
+        <div class="metric-number">${formatBudgetIntelligent(budgetSum)}</div>
         <div class="metric-label">Budget total (sélection)</div>
     </div>
     <div class="metric-item">
@@ -1133,7 +1160,7 @@ function updateTableFooterMetrics() {
         <div class="metric-label">Projets (sélection)</div>
     </div>
     <div class="metric-item">
-        <div class="metric-number">${formatNumber(avgBudget)} M€</div>
+        <div class="metric-number">${formatBudgetIntelligent(avgBudget)}</div>
         <div class="metric-label">Budget moyen (sélection)</div>
     </div>
     <div class="metric-item">
@@ -1221,7 +1248,7 @@ function populateBudgetByCountryTable() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${entry.country}</td>
-      <td class="number-cell">${formatNumber(entry.budget)} M€</td>
+      <td class="number-cell">${formatBudgetIntelligent(entry.budget)}</td>
       <td class="number-cell">${entry.count}</td>
     `;
     tableBody.appendChild(tr);
@@ -1286,7 +1313,7 @@ function updateBarChart() { // Top Projects by Budget
         backgroundColor: 'rgba(44,62,80,0.95)',
         titleFont: { size: isMobile ? 12 : 14 }, bodyFont: { size: isMobile ? 11 : 13 },
         callbacks: {
-          label: context => `Budget: ${formatNumber(context.parsed.x)} M€`,
+          label: context => `Budget: ${formatBudgetIntelligent(context.parsed.x)}`,
           title: context => topData[context[0].dataIndex].title // Full title in tooltip
         }
       }
@@ -1397,7 +1424,7 @@ function updateLineChart() { // Project Evolution by Year
         callbacks: {
           label: context => {
             const val = formatNumber(context.parsed.y);
-            return context.datasetIndex === 0 ? `${val} projets` : `Budget: ${val} M€`;
+            return context.datasetIndex === 0 ? `${val} projets` : `Budget: ${formatBudgetIntelligent(context.parsed.y)}`;
           },
           title: context => `Année ${context[0].label}` // Show year in tooltip title
         }
@@ -1519,7 +1546,7 @@ function updateSectorChart() { // Sectoral Distribution (Polar Area)
                 callbacks: {
                     label: context => { // Show budget and project count
                         const index = context.dataIndex;
-                        return [`Budget: ${formatNumber(budgets[index])} M€`, `Projets: ${counts[index]}`];
+                        return [`Budget: ${formatBudgetIntelligent(budgets[index])}`, `Projets: ${counts[index]}`];
                     }
                 }
             }
